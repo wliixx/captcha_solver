@@ -1,17 +1,3 @@
-
-"""
-Учебный проект: нейросеть, которая учится распознавать капчи.
- 
-Данные не нужно скачивать: капчи генерируются на лету библиотекой `captcha`,
-поэтому у нас бесконечный обучающий набор с готовыми правильными ответами.
- 
-Архитектура: CRNN (CNN -> двунаправленный GRU) + функция потерь CTC.
- 
-Использование:
-    python captcha_solver.py demo                      # сохранить пример капчи
-    python captcha_solver.py train --epochs 15         # обучить модель
-    python captcha_solver.py predict --image demo.png  # распознать картинку
-"""
 import argparse
 import os
 import random
