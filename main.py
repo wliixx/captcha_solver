@@ -4,6 +4,14 @@ from torch import nn
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
+torch.manual_seed(42)
+
+device = torch.device(
+    "cuda" if torch.cuda.is_available() else "cpu"
+)
+
+print(f"устройство: {device}")
+
 transform = transforms.ToTensor()
 
 train_data = datasets.MNIST(
@@ -47,9 +55,33 @@ class DigitClassifier(nn.Module):
         x = self.flatten(x)
         x = self.layers(x)
         return x
+def train_one_epoch(model,loader, loss_fn, optimizer):
+    model.train
+    total_loss = 0.0
+    correct = 0 
+    total = 0
     
-model = DigitClassifier()
+    for images, labels in loader:
+        images = images.to(device)
+        labels = labels.to(device)
+        
+        optimizer.zero_grad(set_to_none=True)
+        logits = model(images)
+        loss = loss_fn(logits, labels)
+        loss.backward()
+        optimizer.step()
+        batch_size = labels.size(0)
+        total_loss += loss.item()*batch_size
+        predictions = logits.atgmax(dim=1)
+        correct += (predictions == labels).sum().item()
+        total += batch_size
+        
+    average_loss = total_loss / total
+    accurancy = correct / total
+    return average_loss, accurancy
 
+
+        
 loss_fn = nn.CrossEntropyLoss
 loss = loss_fn(logits, label)
 loss.backward()
