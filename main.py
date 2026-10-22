@@ -105,7 +105,7 @@ def evaluate(model, loader, loss_fn):
         return average_loss, accurancy
 
 def main():
-    modal = DigitClassifier().to(device)
+    model = DigitClassifier().to(device)
     loss_fn = nn.CrossEntropyLoss()
     
     optimizer = torch.optim.Adam(
