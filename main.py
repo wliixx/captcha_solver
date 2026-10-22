@@ -72,13 +72,13 @@ def train_one_epoch(model,loader, loss_fn, optimizer):
         optimizer.step()
         batch_size = labels.size(0)
         total_loss += loss.item()*batch_size
-        predictions = logits.atgmax(dim=1)
+        predictions = logits.argmax(dim=1)
         correct += (predictions == labels).sum().item()
         total += batch_size
         
     average_loss = total_loss / total
-    accurancy = correct / total
-    return average_loss, accurancy
+    accuracy = correct / total
+    return average_loss, accuracy
 
 def evaluate(model, loader, loss_fn):
     model.eval()
@@ -101,8 +101,8 @@ def evaluate(model, loader, loss_fn):
             correct += (predictions == labels).sum().item()
             total += batch_size
         average_loss = total_loss / total
-        accurancy = correct / total
-        return average_loss, accurancy
+        accuracy = correct / total
+        return average_loss, accuracy
 
 def main():
     model = DigitClassifier().to(device)
@@ -112,3 +112,44 @@ def main():
         model.parameters(),
         lr=0.001,
     )
+    
+    epochs = 5
+    for epoch in range(epochs):
+        train_loss, train_accuracy = train_one_epoch(
+            model,
+            train_loader,
+            loss_fn,
+            optimizer,
+        )
+        test_loss, test_accuracy = evaluate(
+            model,
+            test_loader,
+            loss_fn
+        )
+        print(
+            f"Эпоха {epoch + 1}/{epochs} | "
+            f"Потери: {train_loss:.4f} | "
+            f"Точность обучения: {train_accuracy:.2%} | "
+            f"Точность теста: {test_accuracy:.2%}"
+        )
+        
+    torch.save(
+        model.state_dict(),
+        'mnist_digit_model.pth',
+    )
+    
+    print('модель сохранена')
+    
+    image, true_label = test_data[0]
+    
+    model.eval()
+    with torch.inference_mode():
+        image_batch = image.unsqueeze(0).to(device)
+        logits = model(image_batch)
+        prediction = logits.argmax(dim=1).item()
+        
+    print(f"Правильная цифра: {true_label}")
+    print(f"Предсказание модели: {prediction}")
+
+if __name__ == '__main__':
+    main()
