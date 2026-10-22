@@ -80,12 +80,35 @@ def train_one_epoch(model,loader, loss_fn, optimizer):
     accurancy = correct / total
     return average_loss, accurancy
 
+def evaluate(model, loader, loss_fn):
+    model.eval()
+    total_loss = 0.0
+    correct = 0
+    total = 0
+    
+    with torch.inference_mode():
+        for images, labels in loader:
+            images = images.to(device)
+            labels = labels.to(device)
 
-        
-loss_fn = nn.CrossEntropyLoss
-loss = loss_fn(logits, label)
-loss.backward()
-optimizer = torch.optim.Adam(
-    model.parameters(),
-    lr=0.001,
-)
+            logits = model(images)
+            loss = loss_fn(logits, labels)
+
+            batch_size = labels.size(0)
+            total_loss += loss.item() * batch_size
+
+            predictions = logits.argmax(dim=1)
+            correct += (predictions == labels).sum().item()
+            total += batch_size
+        average_loss = total_loss / total
+        accurancy = correct / total
+        return average_loss, accurancy
+
+def main():
+    modal = DigitClassifier().to(device)
+    loss_fn = nn.CrossEntropyLoss()
+    
+    optimizer = torch.optim.Adam(
+        model.parameters(),
+        lr=0.001,
+    )
